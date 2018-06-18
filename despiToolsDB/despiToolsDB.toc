@@ -1,0 +1,10 @@
+## Interface: 70300
+## Title: despi Tools DB
+## Notes: Database for despi Tools.
+## Author: despi
+## Version: 1.0.0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## LoadWith: despiTools
+## SavedVariables: despiToolsDB
+despiToolsDB.lua

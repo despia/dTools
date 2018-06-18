@@ -1,0 +1,57 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+
+<EditBox name="IMConfigEditbox" letters="80" virtual="true">
+    <Size>
+        <AbsDimension x="130" y="32"></AbsDimension>
+    </Size>
+    <Anchors>
+        <Anchor point="BOTTOM">
+            <Offset>
+                <AbsDimension x="0" y="0"></AbsDimension>
+            </Offset>
+        </Anchor>
+    </Anchors>
+    <Layers>
+        <Layer level="BACKGROUND">
+            <Texture file="Interface\ChatFrame\UI-ChatInputBorder-Left">
+                <Size>
+                    <AbsDimension x="75" y="32"></AbsDimension>
+                </Size>
+                <Anchors>
+                    <Anchor point="LEFT">
+                        <Offset>
+                            <AbsDimension x="-15" y="0"></AbsDimension>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <TexCoords left="0" right="0.2" top="0" bottom="1.0"></TexCoords>
+            </Texture>
+            <Texture file="Interface\ChatFrame\UI-ChatInputBorder-Right">
+                <Size>
+                    <AbsDimension x="75" y="32"></AbsDimension>
+                </Size>
+                <Anchors>
+                    <Anchor point="RIGHT">
+                        <Offset>
+                            <AbsDimension x="0" y="0"></AbsDimension>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <TexCoords left="0.7" right="1.0" top="0" bottom="1.0"></TexCoords>
+            </Texture>
+        </Layer>
+    </Layers>
+    <Scripts>
+        <OnEscapePressed>
+            self:ClearFocus()
+        </OnEscapePressed>
+        <OnEnterPressed>
+            self:ClearFocus()
+        </OnEnterPressed>
+    </Scripts>
+    <FontString inherits="ChatFontNormal"></FontString>
+</EditBox>
+
+
+
+</Ui>

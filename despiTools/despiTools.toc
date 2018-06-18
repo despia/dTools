@@ -1,0 +1,9 @@
+## Interface: 70300
+## Title: despi Tools
+## Author: despi
+## Version: 1.0.0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## Dependencies: despiToolsDB
+## SavedVariablesPerCharacter: despiToolsSettings
+despiTools.lua
