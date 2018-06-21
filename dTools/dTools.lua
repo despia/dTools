@@ -1,74 +1,10 @@
 local addonName, addon = ...
 
-despiToolsSettings = despiToolsSettings or {}
-local DTS = despiToolsSettings
+dToolsSettings = despiToolsSettings or {}
+local DTS = despiToolsSettings or {}
 local DT = {}
 
-local formatMessage = function(payload)
-  return table.concat(payload, ":")
-end
-
-local trackedPrefixes = {
-  ["DTWA_REQ"] = function(msg, channel, author)
-    SendAddonMessage("DTWA_ROTA", formatMessage(testRotation), "RAID")
-  end,
-  ["DTWA_JOINED"] = function(msg, channel, author)
-    print(msg, channel, author)
-    print(formatMessage(testRotation))
-    SendAddonMessage("DTWA_ROTA", formatMessage(testRotation), "WHISPER", author)
-  end,
-  ["DTWA_HANDSHAKE"] = function(msg, channel, author)
-  end,
-}
-
-local trackedEvents = {
-  ["CHAT_MSG_ADDON"] = function(prefix, ...)
-    if trackedPrefixes[prefix] then
-      print(prefix, ...)
-      trackedPrefixes[prefix](...)
-    end
-  end,
-}
-
-local trackedSlashOptions = {
-  ["sync"] = function(msg, editbox)
-    print("sync requested")
-    print(msg, editbox)
-  end,
-}
-
--- setup frame and eventhandler
-local function eventHandler(self, event, ...)
-  if trackedEvents[event] then
-    trackedEvents[event](...)
-  end
-end
-local eventFrame = CreateFrame("FRAME")
-for k,_ in pairs(trackedEvents) do
-  eventFrame:RegisterEvent(k)
-end
-eventFrame:SetScript("OnEvent", eventHandler)
-
--- setup prefixes
-for k,_ in pairs(trackedPrefixes) do
-  if not RegisterAddonMessagePrefix(k) then print("DT failed to register prefix: " ..k) end
-end
-
--- setup slash commands
-SLASH_DESPITOOLS1 = '/dt'
-SLASH_DESPITOOLS2 = '/despitools'
-function SlashCmdList.DESPITOOLS(msg, editbox)
-  if msg == "" then
-    return DT:Open()
-  end 
-  for k,v in pairs(trackedSlashOptions) do
-    if msg:find(k) then
-      v(msg, editbox)
-    end
-  end
-end
-
-function DTS:Open()
+local function Open()
   if not DT["children"] then
     -- CONFIG
     local editboxSpacing = 20
@@ -377,4 +313,70 @@ function DTS:Open()
   end
 end
 
-DTS:Open()
+local formatMessage = function(payload)
+  return table.concat(payload, ":")
+end
+
+local trackedPrefixes = {
+  ["DTWA_REQ"] = function(msg, channel, author)
+    SendAddonMessage("DTWA_ROTA", formatMessage(testRotation), "RAID")
+  end,
+  ["DTWA_JOINED"] = function(msg, channel, author)
+    print(msg, channel, author)
+    print(formatMessage(testRotation))
+    SendAddonMessage("DTWA_ROTA", formatMessage(testRotation), "WHISPER", author)
+  end,
+  ["DTWA_HANDSHAKE"] = function(msg, channel, author)
+  end,
+}
+
+local trackedEvents = {
+  ["CHAT_MSG_ADDON"] = function(prefix, ...)
+    if trackedPrefixes[prefix] then
+      print(prefix, ...)
+      trackedPrefixes[prefix](...)
+    end
+  end,
+  [ "ADDON_LOADED"] = function(name)
+    if addonName == name then
+      Open()
+    end
+  end,
+}
+
+local trackedSlashOptions = {
+  ["sync"] = function(msg, editbox)
+    print("sync requested")
+    print(msg, editbox)
+  end,
+}
+
+-- setup frame and eventhandler
+local function eventHandler(self, event, ...)
+  if trackedEvents[event] then
+    trackedEvents[event](...)
+  end
+end
+local eventFrame = CreateFrame("FRAME")
+for k,_ in pairs(trackedEvents) do
+  eventFrame:RegisterEvent(k)
+end
+eventFrame:SetScript("OnEvent", eventHandler)
+
+-- setup prefixes
+for k,_ in pairs(trackedPrefixes) do
+  if not RegisterAddonMessagePrefix(k) then print("DT failed to register prefix: " ..k) end
+end
+
+-- setup slash commands
+SLASH_DTOOLS1 = '/dtools'
+function SlashCmdList.DTOOLS(msg, editbox)
+  if msg == "" then
+    return Open()
+  end
+  for k,v in pairs(trackedSlashOptions) do
+    if msg:find(k) then
+      v(msg, editbox)
+    end
+  end
+end
