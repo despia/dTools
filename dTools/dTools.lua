@@ -1,15 +1,15 @@
 local addonName, addon = ...
 
-dToolsSettings = dToolsSettings or {}
-local DTS = dToolsSettings or {}
-local DT = {}
+dToolsSaved = dToolsSaved or {}
+local S = dToolsSaved
+local DT
 
 local function Open()
-  if not DT["children"] then
+  if not DT then
     -- CONFIG
     local editboxSpacing = 20
-    local numberRotationEntries = DTS["numberRotationEntries"] or 5
-    local numberBackupEntries = DTS["numberBackupEntries"] or 3
+    local numberRotationEntries = S["numberRotationEntries"] or 5
+    local numberBackupEntries = S["numberBackupEntries"] or 3
 
     -- CREATE FRAME
     local optionsFrame = CreateFrame("Frame", "despiToolsOptions", UIParent)
@@ -51,11 +51,20 @@ local function Open()
     rotationEditBoxRota1:SetFontObject(GameFontHighlightSmall)
     rotationEditBoxRota1:SetAutoFocus(false)
     rotationEditBoxRota1:SetJustifyH('CENTER')
+    rotationEditBoxRota1:SetText(S["Rotation"][1] or "")
     rotationEditBoxRota1:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Rotation"][1])
       self:ClearFocus()
     end)
     rotationEditBoxRota1:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Rotation"][1] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationEditBoxRota1:SetBackdrop({
@@ -81,11 +90,20 @@ local function Open()
     rotationEditBoxRota2:SetFontObject(GameFontHighlightSmall)
     rotationEditBoxRota2:SetAutoFocus(false)
     rotationEditBoxRota2:SetJustifyH('CENTER')
+    rotationEditBoxRota2:SetText(S["Rotation"][2] or "")
     rotationEditBoxRota2:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Rotation"][2])
       self:ClearFocus()
     end)
-    rotationEditBoxRota1:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+    rotationEditBoxRota2:SetScript('OnEnterPressed', function(self)
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Rotation"][2] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationEditBoxRota2:SetBackdrop({
@@ -111,11 +129,20 @@ local function Open()
     rotationEditBoxRota3:SetFontObject(GameFontHighlightSmall)
     rotationEditBoxRota3:SetAutoFocus(false)
     rotationEditBoxRota3:SetJustifyH('CENTER')
+    rotationEditBoxRota3:SetText(S["Rotation"][3] or "")
     rotationEditBoxRota3:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Rotation"][3])
       self:ClearFocus()
     end)
     rotationEditBoxRota3:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Rotation"][3] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationEditBoxRota3:SetBackdrop({
@@ -141,11 +168,20 @@ local function Open()
     rotationEditBoxRota4:SetFontObject(GameFontHighlightSmall)
     rotationEditBoxRota4:SetAutoFocus(false)
     rotationEditBoxRota4:SetJustifyH('CENTER')
+    rotationEditBoxRota4:SetText(S["Rotation"][4] or "")
     rotationEditBoxRota4:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Rotation"][4])
       self:ClearFocus()
     end)
     rotationEditBoxRota4:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Rotation"][4] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationEditBoxRota4:SetBackdrop({
@@ -171,11 +207,20 @@ local function Open()
     rotationEditBoxRota5:SetFontObject(GameFontHighlightSmall)
     rotationEditBoxRota5:SetAutoFocus(false)
     rotationEditBoxRota5:SetJustifyH('CENTER')
+    rotationEditBoxRota5:SetText(S["Rotation"][5] or "")
     rotationEditBoxRota5:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Rotation"][5])
       self:ClearFocus()
     end)
     rotationEditBoxRota5:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Rotation"][5] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationEditBoxRota5:SetBackdrop({
@@ -208,11 +253,20 @@ local function Open()
     rotationBackupEditBox1:SetFontObject(GameFontHighlightSmall)
     rotationBackupEditBox1:SetAutoFocus(false)
     rotationBackupEditBox1:SetJustifyH('CENTER')
+    rotationBackupEditBox1:SetText(S["Backup"][1] or "")
     rotationBackupEditBox1:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Backup"][1])
       self:ClearFocus()
     end)
     rotationBackupEditBox1:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Backup"][1] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationBackupEditBox1:SetBackdrop({
@@ -238,11 +292,20 @@ local function Open()
     rotationBackupEditBox2:SetFontObject(GameFontHighlightSmall)
     rotationBackupEditBox2:SetAutoFocus(false)
     rotationBackupEditBox2:SetJustifyH('CENTER')
+    rotationBackupEditBox2:SetText(S["Backup"][2] or "")
     rotationBackupEditBox2:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Backup"][2])
       self:ClearFocus()
     end)
     rotationBackupEditBox2:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Backup"][2] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationBackupEditBox2:SetBackdrop({
@@ -268,11 +331,20 @@ local function Open()
     rotationBackupEditBox3:SetFontObject(GameFontHighlightSmall)
     rotationBackupEditBox3:SetAutoFocus(false)
     rotationBackupEditBox3:SetJustifyH('CENTER')
+    rotationBackupEditBox3:SetText(S["Backup"][3] or "")
     rotationBackupEditBox3:SetScript('OnEscapePressed', function(self)
+      self:SetText(S["Backup"][3])
       self:ClearFocus()
     end)
     rotationBackupEditBox3:SetScript('OnEnterPressed', function(self)
-      self:ClearFocus()
+      local text = self:GetText()
+      if text == "" or UnitExists(text) then
+        S["Backup"][3] = text
+        self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
+        self:ClearFocus()
+      else
+        self:SetBackdropBorderColor(1, 0, 0, 0.8)
+      end
     end)
 
     rotationBackupEditBox3:SetBackdrop({
@@ -313,6 +385,17 @@ local function Open()
   end
 end
 
+local eventFrame = CreateFrame("frame")
+
+local function Init()
+  if not S["Rotation"] then
+    S["Rotation"] = {"","","","",""}
+  end
+  if not S["Backup"] then
+    S["Backup"] = {"","",""}
+  end
+end
+
 local formatMessage = function(payload)
   return table.concat(payload, ":")
 end
@@ -339,7 +422,9 @@ local trackedEvents = {
   end,
   [ "ADDON_LOADED"] = function(name)
     if addonName == name then
+      Init()
       Open()
+      eventFrame:UnregisterEvent("ADDON_LOADED")
     end
   end,
 }
@@ -357,7 +442,6 @@ local function eventHandler(self, event, ...)
     trackedEvents[event](...)
   end
 end
-local eventFrame = CreateFrame("FRAME")
 for k,_ in pairs(trackedEvents) do
   eventFrame:RegisterEvent(k)
 end
@@ -374,6 +458,7 @@ function SlashCmdList.DTOOLS(msg, editbox)
   if msg == "" then
     return Open()
   end
+  msg = msg.lower()
   for k,v in pairs(trackedSlashOptions) do
     if msg:find(k) then
       v(msg, editbox)
