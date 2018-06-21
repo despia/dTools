@@ -1,1 +1,0 @@
-despiToolsDB = despiToolsDB or {}

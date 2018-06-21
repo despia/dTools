@@ -1,8 +1,8 @@
 ## Interface: 70300
-## Title: despi Tools
-## Author: despi
+## Title: dTools
+## Author: despi91
 ## Version: 1.0.0
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: despiToolsSettings
-despiTools.lua
+dTools.lua

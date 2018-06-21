@@ -2,7 +2,7 @@ local addonName, addon = ...
 
 despiToolsSettings = despiToolsSettings or {}
 local DTS = despiToolsSettings
-local DT = addon
+local DT = {}
 
 local formatMessage = function(payload)
   return table.concat(payload, ":")
