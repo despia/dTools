@@ -4,6 +4,5 @@
 ## Version: 1.0.0
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
-## Dependencies: despiToolsDB
 ## SavedVariablesPerCharacter: despiToolsSettings
 despiTools.lua
