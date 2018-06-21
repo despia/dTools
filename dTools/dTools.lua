@@ -1,7 +1,7 @@
 local addonName, addon = ...
 
-dToolsSettings = despiToolsSettings or {}
-local DTS = despiToolsSettings or {}
+dToolsSettings = dToolsSettings or {}
+local DTS = dToolsSettings or {}
 local DT = {}
 
 local function Open()
