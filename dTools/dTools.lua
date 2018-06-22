@@ -1,10 +1,34 @@
 local addonName, addon = ...
 
-dToolsSaved = dToolsSaved or {}
-local S = dToolsSaved
+local S
 local DT
 
-local function Open()
+addon["published"] = false
+addon["leader"] = true
+addon["group"] = {}
+addon["rivals"] = {}
+
+local function createMessage()
+  return table.concat(S["Rotation"], ":") ..":" ..table.concat(S["Backup"], ":")
+end
+
+local function GroupMembers(reversed, forceParty)
+  local unit  = (not forceParty and IsInRaid()) and 'raid' or 'party'
+  local numGroupMembers = (forceParty and GetNumSubgroupMembers()  or GetNumGroupMembers()) - (unit == "party" and 1 or 0)
+  local i = reversed and numGroupMembers or (unit == 'party' and 0 or 1)
+  return function()
+     local ret
+     if i == 0 and unit == 'party' then
+        ret = 'player'
+     elseif i <= numGroupMembers and i > 0 then
+        ret = unit .. i
+     end
+     i = i + (reversed and -1 or 1)
+     return ret
+  end
+end
+
+function addon:Open()
   if not DT then
     -- CONFIG
     local editboxSpacing = 20
@@ -60,6 +84,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Rotation"][1] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -99,6 +124,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Rotation"][2] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -138,6 +164,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Rotation"][3] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -177,6 +204,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Rotation"][4] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -216,6 +244,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Rotation"][5] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -262,6 +291,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Backup"][1] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -301,6 +331,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Backup"][2] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -340,6 +371,7 @@ local function Open()
       local text = self:GetText()
       if text == "" or UnitExists(text) then
         S["Backup"][3] = text
+        addon["published"] = false
         self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
         self:ClearFocus()
       else
@@ -363,15 +395,8 @@ local function Open()
     rotationButtonSend:SetText("Send")
     rotationButtonSend:SetPoint('BOTTOM', optionsFrame, 'BOTTOM', 0, 5)
     rotationButtonSend:SetScript('OnClick', function(self)
-      local msg = ''
-      for n = 1,5 do
-        msg = msg ..optionsFrame["children"]["RotationEditBox" ..n]:GetText() ..":"
-      end
-      for n = 1,3 do
-        msg = msg ..optionsFrame["children"]["BackupEditBox" ..n]:GetText() ..(n == 3 and "" or ":")
-      end
-
-      SendAddonMessage('DTWA_ROTA', msg, 'RAID')
+      addon["published"] = true
+      SendAddonMessage('DTWA_ROTA', createMessage(), 'RAID')
     end)
 
     optionsFrame:Show()
@@ -387,7 +412,13 @@ end
 
 local eventFrame = CreateFrame("frame")
 
-local function Init()
+function addon:Init()
+  S = dToolsSaved or {}
+  if IsInRaid() then
+    for unit in GroupMembers() do
+      addon["group"][UnitName(unit)] = true
+    end
+  end
   if not S["Rotation"] then
     S["Rotation"] = {"","","","",""}
   end
@@ -396,20 +427,16 @@ local function Init()
   end
 end
 
-local formatMessage = function(payload)
-  return table.concat(payload, ":")
-end
-
 local trackedPrefixes = {
   ["DTWA_REQ"] = function(msg, channel, author)
-    SendAddonMessage("DTWA_ROTA", formatMessage(testRotation), "RAID")
+    if addon["published"] and addon["leader"] then
+      SendAddonMessage("DTWA_ROTA", createMessage(), "WHISPER", author)
+    end
   end,
-  ["DTWA_JOINED"] = function(msg, channel, author)
-    print(msg, channel, author)
-    print(formatMessage(testRotation))
-    SendAddonMessage("DTWA_ROTA", formatMessage(testRotation), "WHISPER", author)
-  end,
-  ["DTWA_HANDSHAKE"] = function(msg, channel, author)
+  ["DT_HANDSHAKE"] = function(msg, channel, author)
+    if channel == "RAID" or channel == "GROUP" then
+      addon["rivals"][#addon["rivals"] +1] = author -- remove ppl when they leave
+    end
   end,
 }
 
@@ -420,13 +447,26 @@ local trackedEvents = {
       trackedPrefixes[prefix](...)
     end
   end,
-  [ "ADDON_LOADED"] = function(name)
+  ["ADDON_LOADED"] = function(name)
     if addonName == name then
-      Init()
-      Open()
+      addon:Init()
+      addon:Open()
       eventFrame:UnregisterEvent("ADDON_LOADED")
     end
   end,
+  ["GROUP_ROSTER_UPDATE"] = function()
+    if addon["published"] and addon["leader"] then
+      local group = {}
+      for unit in GroupMembers() do
+        local n = UnitName(unit)
+        group[n] = true
+        if not addon["group"][n] then
+          SendAddonMessage("DTWA_ROTA", createMessage(), "WHISPER", n)
+        end
+      end
+      addon["group"] = group
+    end
+  end
 }
 
 local trackedSlashOptions = {
@@ -456,7 +496,7 @@ end
 SLASH_DTOOLS1 = '/dtools'
 function SlashCmdList.DTOOLS(msg, editbox)
   if msg == "" then
-    return Open()
+    return addon:Open()
   end
   msg = msg.lower()
   for k,v in pairs(trackedSlashOptions) do
