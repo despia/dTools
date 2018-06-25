@@ -147,12 +147,12 @@ function addon:Open()
     local anchor = rotationHeader
     for i = 1,5 do
       local editbox = DT:createEditBox(S["Rotation"][i], currentParent, anchor, i, function(self)
-        self:SetText(S["Rotation"][valueID])
+        self:SetText(S["Rotation"][i])
         self:ClearFocus()
       end, function(self)
         local text = self:GetText()
         if text == "" or UnitExists(text) then
-          S["Rotation"][valueID] = text
+          S["Rotation"][i] = text
           addon["published"] = false
           self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
           self:ClearFocus()
@@ -183,12 +183,12 @@ function addon:Open()
     anchor = backupHeader
     for i = 1,3 do
       local editbox = DT:createEditBox(S["Backup"][i], currentParent, anchor, i, function(self)
-        self:SetText(S["Backup"][valueID])
+        self:SetText(S["Backup"][i])
         self:ClearFocus()
       end, function(self)
         local text = self:GetText()
         if text == "" or UnitExists(text) then
-          S["Backup"][valueID] = text
+          S["Backup"][i] = text
           addon["published"] = false
           self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
           self:ClearFocus()
