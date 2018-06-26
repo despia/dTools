@@ -55,12 +55,12 @@ function addon:Open()
       btn:SetSize(100, 25)
       btn:SetText(text)
       btn['key'] = key
-      btn['targetKey'] = key *100
+      btn['targetKey'] = key * 100
       if onClick then btn:SetScript('OnClick', onClick) end
       local clicked = CreateFrame('button', nil, self, 'UIGoldBorderButtonTemplate')
       clicked:SetWidth(100, 25)
       clicked:SetText(text)
-      clicked['key'] = key *100
+      clicked['key'] = key * 100
       clicked['targetKey'] = key
       if onClicked then clicked:SetScript('OnClick', onClicked) end
       clicked:Hide()
@@ -118,8 +118,8 @@ function addon:Open()
       local btn, clicked = DT:createMenuButton(v, k, function(self)
         self:Hide()
         for i,_ in ipairs(DT['children']['MENU']) do
-          if DT['children']['MENU'][i *100]:IsShown() then
-            DT['children']['MENU'][i *100]:Hide()
+          if DT['children']['MENU'][i * 100]:IsShown() then
+            DT['children']['MENU'][i * 100]:Hide()
             DT['children']['MENU'][i]:Show()
           end
         end
@@ -128,10 +128,10 @@ function addon:Open()
         self:Hide()
         DT['children']['MENU'][self['targetKey']]:Show()
       end)
-      btn:SetPoint('TOPLEFT', DT, 'TOPLEFT', 10, -10 +(k -1) *-30)
-      clicked:SetPoint('TOPLEFT', DT, 'TOPLEFT', 10, -10 +(k -1) *-30)
+      btn:SetPoint('TOPLEFT', DT, 'TOPLEFT', 10, -10 + (k - 1) * -30)
+      clicked:SetPoint('TOPLEFT', DT, 'TOPLEFT', 10, -10 + (k - 1) * -30)
       children['MENU'][k] = btn
-      children['MENU'][k *100] = clicked
+      children['MENU'][k * 100] = clicked
     end
     
     DT['children']['INTERRUPT'] = {}
@@ -163,8 +163,8 @@ function addon:Open()
       anchor = editbox
       local editboxHeader = DT:createHeader(i, editbox)
       editboxHeader:SetPoint('LEFT', editbox, 'LEFT', -10, 0)
-      interrupt['rotationEditBox'][#interrupt['rotationEditBox'] +1] = editbox
-      interrupt['rotationEditBoxLabel'][#interrupt['rotationEditBoxLabel'] +1] = editboxHeader
+      interrupt['rotationEditBox'][#interrupt['rotationEditBox'] + 1] = editbox
+      interrupt['rotationEditBoxLabel'][#interrupt['rotationEditBoxLabel'] + 1] = editboxHeader
     end
 
     local interruptPublish = DT:createButton('Publish', currentParent, function(self)
@@ -199,8 +199,8 @@ function addon:Open()
       anchor = editbox
       local editboxHeader = DT:createHeader(i, editbox)
       editboxHeader:SetPoint('LEFT', editbox, 'LEFT', -10, 0)
-      interrupt['backupEditBox'][#interrupt['backupEditBox'] +1] = editbox
-      interrupt['backupEditBoxLabel'][#interrupt['backupEditBoxLabel'] +1] = editboxHeader
+      interrupt['backupEditBox'][#interrupt['backupEditBox'] + 1] = editbox
+      interrupt['backupEditBoxLabel'][#interrupt['backupEditBoxLabel'] + 1] = editboxHeader
     end
 
     children['MENU'][1]:Click()
@@ -239,7 +239,7 @@ local trackedPrefixes = {
   end,
   ["DT_HANDSHAKE"] = function(msg, channel, author)
     if channel == "RAID" or channel == "GROUP" then
-      addon["rivals"][#addon["rivals"] +1] = author -- remove ppl when they leave
+      addon["rivals"][#addon["rivals"] + 1] = author -- remove ppl when they leave
     end
   end,
 }
@@ -293,7 +293,7 @@ eventFrame:SetScript("OnEvent", eventHandler)
 
 -- setup prefixes
 for k,_ in pairs(trackedPrefixes) do
-  if not RegisterAddonMessagePrefix(k) then print("DT failed to register prefix: " ..k) end
+  if not RegisterAddonMessagePrefix(k) then print("DT failed to register prefix: " .. k) end
 end
 
 -- setup slash commands
