@@ -203,6 +203,12 @@ function addon:Open()
       interrupt['backupEditBoxLabel'][#interrupt['backupEditBoxLabel'] + 1] = editboxHeader
     end
 
+    local closeButton = DT:createButton('Close', DT, function()
+      DT:Hide()
+    end)
+    closeButton:SetPoint('BOTTOMLEFT', DT, 'BOTTOMLEFT', 10, 10)
+    children['CLOSE'] = closeButton
+
     children['MENU'][1]:Click()
     DT:Show()
   else
