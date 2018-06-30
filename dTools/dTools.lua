@@ -4,7 +4,6 @@ local S
 local DT
 
 addon['published'] = false
-addon['leader'] = true
 addon['group'] = {}
 addon['rivals'] = {}
 
@@ -56,6 +55,7 @@ function addon:Open()
       end
       local rivals = addon['rivals']
       local frames = DT['children']['INTERRUPT']['RIVALS']
+      print(rivals['LEADER'])
       for k,v in ipairs(rivals) do
         if not frames[k] then
           print(v)
@@ -221,8 +221,9 @@ function addon:Open()
     local interruptHandshake = DT:createButton('Handshake', currentParent, function(self)
       local DT = DT
       addon['rivals'] = {}
+      addon['rivals']['LEADER'] = UnitName('player')
       SendAddonMessage('DT_HANDSHAKE', 'REQUEST', 'RAID')
-      C_Timer.After(3, function() DT:updateRivals() end)
+      DT:updateRivals()
     end)
     interruptHandshake:SetPoint('RIGHT', interruptPublish, 'LEFT', -10, 0)
     interrupt['handshakeButton'] = interruptHandshake
@@ -267,7 +268,8 @@ end
 
 local trackedPrefixes = {
   ['DTWA_REQ'] = function(msg, channel, author)
-    if addon['published'] and addon['leader'] then
+    if addon['published']
+    and addon['rivals']['LEADER'] == UnitName('player') then
       SendAddonMessage('DTWA_ROTA', createMessage(), 'WHISPER', author)
     end
   end,
@@ -275,12 +277,13 @@ local trackedPrefixes = {
     if channel == 'RAID' or channel == 'GROUP' then
       if msg == 'RESPONSE' then
         addon['rivals'][#addon['rivals'] + 1] = UnitName(author)
+        DT:updateRivals()
       end
       if msg == 'REQUEST' then
         addon['rivals']['LEADER'] = UnitName(author)
         SendAddonMessage('DT_HANDSHAKE', 'RESPONSE', channel)
+        DT:updateRivals()
       end
-      addon['rivals'][#addon['rivals'] + 1] = author -- remove ppl when they leave
     end
   end,
 }
@@ -288,7 +291,6 @@ local trackedPrefixes = {
 local trackedEvents = {
   ['CHAT_MSG_ADDON'] = function(prefix, ...)
     if trackedPrefixes[prefix] then
-      print(prefix, ...)
       trackedPrefixes[prefix](...)
     end
   end,
@@ -300,7 +302,8 @@ local trackedEvents = {
     end
   end,
   ['GROUP_ROSTER_UPDATE'] = function()
-    if addon['published'] and addon['leader'] then
+    if addon['published']
+    and addon['rivals']['LEADER'] == UnitName('player') then
       local group = {}
       for unit in GroupMembers() do
         local n = UnitName(unit)
