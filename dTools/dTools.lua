@@ -3,18 +3,18 @@ local addonName, addon = ...
 local S
 local DT
 
-addon["published"] = false
-addon["leader"] = true
-addon["group"] = {}
-addon["rivals"] = {}
+addon['published'] = false
+addon['leader'] = true
+addon['group'] = {}
+addon['rivals'] = {}
 
 local function createMessage()
-  return table.concat(S["Rotation"], ":") ..":" ..table.concat(S["Backup"], ":")
+  return table.concat(S['Rotation'], ':') ..':' ..table.concat(S['Backup'], ':')
 end
 
 local function GroupMembers(reversed, forceParty)
   local unit  = (not forceParty and IsInRaid()) and 'raid' or 'party'
-  local numGroupMembers = (forceParty and GetNumSubgroupMembers()  or GetNumGroupMembers()) - (unit == "party" and 1 or 0)
+  local numGroupMembers = (forceParty and GetNumSubgroupMembers()  or GetNumGroupMembers()) - (unit == 'party' and 1 or 0)
   local i = reversed and numGroupMembers or (unit == 'party' and 0 or 1)
   return function()
      local ret
@@ -32,8 +32,8 @@ function addon:Open()
   if not DT then
     -- CONFIG
     local editboxSpacing = 20
-    local numberRotationEntries = S["numberRotationEntries"] or 5
-    local numberBackupEntries = S["numberBackupEntries"] or 3
+    local numberRotationEntries = S['numberRotationEntries'] or 5
+    local numberBackupEntries = S['numberBackupEntries'] or 3
 
     -- Addon Frame
     DT = CreateFrame('frame', addonName, UIParent)
@@ -43,12 +43,26 @@ function addon:Open()
     DT:SetFrameLevel(1)
     DT:SetFrameStrata('HIGH')
     DT:SetBackdrop({
-      bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+      bgFile = 'Interface\\DialogFrame\\UI-DialogBox-Background',
     })
     -- Child Table
     DT['children'] = {}
     local children = DT['children']
     children['MENU'] = {}
+
+    function DT:updateRivals()
+      if not DT['children']['INTERRUPT']['RIVALS'] then
+        DT['children']['INTERRUPT']['RIVALS'] = {}
+      end
+      local rivals = addon['rivals']
+      local frames = DT['children']['INTERRUPT']['RIVALS']
+      for k,v in ipairs(rivals) do
+        if not frames[k] then
+          print(v)
+          -- create frame for rival
+        end
+      end
+    end
 
     function DT:createMenuButton(text, key, onClick, onClicked)
       local btn = CreateFrame('button', nil, self, 'UIPanelButtonTemplate')
@@ -84,7 +98,7 @@ function addon:Open()
       box:SetFontObject(GameFontHighlightSmall)
       box:SetAutoFocus(false)
       box:SetJustifyH('CENTER')
-      box:SetText(text or "")
+      box:SetText(text or '')
       box:SetScript('OnEscapePressed', onEscapePressed)
       box:SetScript('OnEnterPressed', onEnterPressed)
   
@@ -134,6 +148,7 @@ function addon:Open()
       children['MENU'][k * 100] = clicked
     end
     
+    -- Interrupt Menu
     DT['children']['INTERRUPT'] = {}
     local interrupt = DT['children']['INTERRUPT']
     local currentParent = children['MENU'][100]
@@ -146,14 +161,14 @@ function addon:Open()
     
     local anchor = rotationHeader
     for i = 1,5 do
-      local editbox = DT:createEditBox(S["Rotation"][i], currentParent, anchor, i, function(self)
-        self:SetText(S["Rotation"][i])
+      local editbox = DT:createEditBox(S['Rotation'][i], currentParent, anchor, i, function(self)
+        self:SetText(S['Rotation'][i])
         self:ClearFocus()
       end, function(self)
         local text = self:GetText()
-        if text == "" or UnitExists(text) then
-          S["Rotation"][i] = text
-          addon["published"] = false
+        if text == '' or UnitExists(text) then
+          S['Rotation'][i] = text
+          addon['published'] = false
           self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
           self:ClearFocus()
         else
@@ -167,29 +182,22 @@ function addon:Open()
       interrupt['rotationEditBoxLabel'][#interrupt['rotationEditBoxLabel'] + 1] = editboxHeader
     end
 
-    local interruptPublish = DT:createButton('Publish', currentParent, function(self)
-      addon["published"] = true
-      SendAddonMessage('DTWA_ROTA', createMessage(), 'RAID')
-    end)
-    interruptPublish:SetPoint('BOTTOMRIGHT', DT, 'BOTTOMRIGHT', -10, 10)
-    interrupt['publishButton'] = interruptPublish
-    
     local backupHeader = DT:createHeader('Backup', currentParent)
     backupHeader:SetPoint('RIGHT', rotationHeader, 'LEFT', -110, 0)
     interrupt['backupHeader'] = backupHeader
     interrupt['backupEditBox'] = {}
     interrupt['backupEditBoxLabel'] = {}
-    
+
     anchor = backupHeader
     for i = 1,3 do
-      local editbox = DT:createEditBox(S["Backup"][i], currentParent, anchor, i, function(self)
-        self:SetText(S["Backup"][i])
+      local editbox = DT:createEditBox(S['Backup'][i], currentParent, anchor, i, function(self)
+        self:SetText(S['Backup'][i])
         self:ClearFocus()
       end, function(self)
         local text = self:GetText()
-        if text == "" or UnitExists(text) then
-          S["Backup"][i] = text
-          addon["published"] = false
+        if text == '' or UnitExists(text) then
+          S['Backup'][i] = text
+          addon['published'] = false
           self:SetBackdropBorderColor(0.3, 0.3, 0.3, 0.8)
           self:ClearFocus()
         else
@@ -202,7 +210,27 @@ function addon:Open()
       interrupt['backupEditBox'][#interrupt['backupEditBox'] + 1] = editbox
       interrupt['backupEditBoxLabel'][#interrupt['backupEditBoxLabel'] + 1] = editboxHeader
     end
+    
+    local interruptPublish = DT:createButton('Publish', currentParent, function(self)
+      addon['published'] = true
+      SendAddonMessage('DTWA_ROTA', createMessage(), 'RAID')
+    end)
+    interruptPublish:SetPoint('BOTTOMRIGHT', DT, 'BOTTOMRIGHT', -10, 10)
+    interrupt['publishButton'] = interruptPublish
+    
+    local interruptHandshake = DT:createButton('Handshake', currentParent, function(self)
+      local DT = DT
+      addon['rivals'] = {}
+      SendAddonMessage('DT_HANDSHAKE', 'REQUEST', 'RAID')
+      C_Timer.After(3, function() DT:updateRivals() end)
+    end)
+    interruptHandshake:SetPoint('RIGHT', interruptPublish, 'LEFT', -10, 0)
+    interrupt['handshakeButton'] = interruptHandshake
 
+    interrupt['RIVALS'] = {}
+    local rivals = interrupt['RIVALS']
+
+    -- Close button
     local closeButton = DT:createButton('Close', DT, function()
       DT:Hide()
     end)
@@ -220,68 +248,75 @@ function addon:Open()
   end
 end
 
-local eventFrame = CreateFrame("frame")
+local eventFrame = CreateFrame('frame')
 
 function addon:Init()
   S = dToolsSaved or {}
   if IsInRaid() then
     for unit in GroupMembers() do
-      addon["group"][UnitName(unit)] = true
+      addon['group'][UnitName(unit)] = true
     end
   end
-  if not S["Rotation"] then
-    S["Rotation"] = {"","","","",""}
+  if not S['Rotation'] then
+    S['Rotation'] = {'','','','',''}
   end
-  if not S["Backup"] then
-    S["Backup"] = {"","",""}
+  if not S['Backup'] then
+    S['Backup'] = {'','',''}
   end
 end
 
 local trackedPrefixes = {
-  ["DTWA_REQ"] = function(msg, channel, author)
-    if addon["published"] and addon["leader"] then
-      SendAddonMessage("DTWA_ROTA", createMessage(), "WHISPER", author)
+  ['DTWA_REQ'] = function(msg, channel, author)
+    if addon['published'] and addon['leader'] then
+      SendAddonMessage('DTWA_ROTA', createMessage(), 'WHISPER', author)
     end
   end,
-  ["DT_HANDSHAKE"] = function(msg, channel, author)
-    if channel == "RAID" or channel == "GROUP" then
-      addon["rivals"][#addon["rivals"] + 1] = author -- remove ppl when they leave
+  ['DT_HANDSHAKE'] = function(msg, channel, author)
+    if channel == 'RAID' or channel == 'GROUP' then
+      if msg == 'RESPONSE' then
+        addon['rivals'][#addon['rivals'] + 1] = UnitName(author)
+      end
+      if msg == 'REQUEST' then
+        addon['rivals']['LEADER'] = UnitName(author)
+        SendAddonMessage('DT_HANDSHAKE', 'RESPONSE', channel)
+      end
+      addon['rivals'][#addon['rivals'] + 1] = author -- remove ppl when they leave
     end
   end,
 }
 
 local trackedEvents = {
-  ["CHAT_MSG_ADDON"] = function(prefix, ...)
+  ['CHAT_MSG_ADDON'] = function(prefix, ...)
     if trackedPrefixes[prefix] then
       print(prefix, ...)
       trackedPrefixes[prefix](...)
     end
   end,
-  ["ADDON_LOADED"] = function(name)
+  ['ADDON_LOADED'] = function(name)
     if addonName == name then
       addon:Init()
       addon:Open()
-      eventFrame:UnregisterEvent("ADDON_LOADED")
+      eventFrame:UnregisterEvent('ADDON_LOADED')
     end
   end,
-  ["GROUP_ROSTER_UPDATE"] = function()
-    if addon["published"] and addon["leader"] then
+  ['GROUP_ROSTER_UPDATE'] = function()
+    if addon['published'] and addon['leader'] then
       local group = {}
       for unit in GroupMembers() do
         local n = UnitName(unit)
         group[n] = true
-        if not addon["group"][n] then
-          SendAddonMessage("DTWA_ROTA", createMessage(), "WHISPER", n)
+        if not addon['group'][n] then
+          SendAddonMessage('DTWA_ROTA', createMessage(), 'WHISPER', n)
         end
       end
-      addon["group"] = group
+      addon['group'] = group
     end
   end
 }
 
 local trackedSlashOptions = {
-  ["sync"] = function(msg, editbox)
-    print("sync requested")
+  ['publish'] = function(msg, editbox)
+    print('sync requested')
     print(msg, editbox)
   end,
 }
@@ -295,17 +330,17 @@ end
 for k,_ in pairs(trackedEvents) do
   eventFrame:RegisterEvent(k)
 end
-eventFrame:SetScript("OnEvent", eventHandler)
+eventFrame:SetScript('OnEvent', eventHandler)
 
 -- setup prefixes
 for k,_ in pairs(trackedPrefixes) do
-  if not RegisterAddonMessagePrefix(k) then print("DT failed to register prefix: " .. k) end
+  if not RegisterAddonMessagePrefix(k) then print('DT failed to register prefix: ' .. k) end
 end
 
 -- setup slash commands
 SLASH_DTOOLS1 = '/dtools'
 function SlashCmdList.DTOOLS(msg, editbox)
-  if msg == "" then
+  if msg == '' then
     return addon:Open()
   end
   msg = msg.lower()
